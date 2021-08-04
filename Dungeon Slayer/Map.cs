@@ -119,7 +119,12 @@ namespace Dungeon_Slayer
         }
 
         //Check if cell contains wall
-        private bool IsWall(int x, int y)
+        public bool IsWall(Vector2DInt position)
+        {
+            return _map[position.x, position.y] == 1;
+        }
+
+        public bool IsWall(int x, int y)
         {
             return _map[x, y] == 1;
         }
@@ -255,6 +260,14 @@ namespace Dungeon_Slayer
         public void BlankCell(int x, int y)
         {
             _map[x, y] = 0;
+        }
+
+     
+
+        public void UpdateCell(int x, int y)
+        {
+            Console.SetCursorPosition(x, y);
+            Console.Write(DecodeSymbol(_map[x, y]));
         }
 
         //Access to chosen starting point.

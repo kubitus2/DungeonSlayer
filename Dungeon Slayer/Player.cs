@@ -5,11 +5,7 @@ using System.Text;
 namespace Dungeon_Slayer
 {
     
-    struct Vector2DInt
-    {
-        public int x;
-        public int y;
-    }
+
 
     class Player
     {
@@ -24,6 +20,7 @@ namespace Dungeon_Slayer
 
         private string _name;
         private bool _isAlive;
+        private int _level;
 
         private Vector2DInt _position;
 
@@ -36,6 +33,7 @@ namespace Dungeon_Slayer
             _agility = agility;
             _power = power;
             _isAlive = true;
+            _level = 1;
         }
 
         private int ThrowDice()
@@ -57,6 +55,7 @@ namespace Dungeon_Slayer
         {
             int hitEffect;
             hitEffect = ThrowDice();
+            //algorithm
 
             return hitEffect;
         }
@@ -84,15 +83,22 @@ namespace Dungeon_Slayer
             //
         }
 
-        public void UpdatePosition(int x, int y)
+        public void MovePlayer(Vector2DInt a)
         {
-            _position.x = x;
-            _position.y = y;
+            _position += a;
         }
-
+        public Vector2DInt GetPosition()
+        {
+            return _position;
+        }
         public int GetHP()
         {
             return _hp;
+        }
+        
+        public void LevelUp()
+        {
+            _level++;
         }
 
         public void RenderPlayer()

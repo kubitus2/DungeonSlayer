@@ -12,27 +12,42 @@ namespace Dungeon_Slayer
         {
 
             Console.CursorVisible = false;
-            bool quit = false;
-            while(!quit)
+            Play();            
+
+        }
+
+        static void Play()
+        {
+            bool isLevelPassed = false;
+
+            Map level = new Map(MAP_WIDTH, MAP_HEIGHT, MAP_FILL_DENSITY);
+            level.StartMap();
+            Player player = CreatePlayer(level);
+            level.DrawMap();
+            player.RenderPlayer();
+
+            while (!isLevelPassed)
             {
                 ConsoleKeyInfo input = Console.ReadKey(true);
-                quit = input.Key == ConsoleKey.Escape;
-                //
-                Map level = new Map(MAP_WIDTH, MAP_HEIGHT, MAP_FILL_DENSITY);
+
+                if (input.Key == ConsoleKey.Escape)
+                    Environment.Exit(0);
+                
                 level.StartMap();
                 level.DrawMap();
+               
 
-                Player player = CreatePlayer(level);
-
-                player.RenderPlayer();
             }
-            
-
         }
 
         static private Player CreatePlayer(Map map)
         {
-            Player player = new Player(map.GetPlayerStart(), 10, 10, 10);
+            //int pointsAvailable = 10;
+            int agility = 10;
+            int power = 10;
+            int luck = 10;
+
+            Player player = new Player(map.GetPlayerStart(), luck, agility, power);
 
             return player;
         }
