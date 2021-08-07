@@ -10,7 +10,7 @@ namespace Dungeon_Slayer
     class Player
     {
         const int PLAYER_MAX_HEALTH = 100;
-        const int PLAYER_MAX_LEVEL = 3;
+        const int PLAYER_MAX_LEVEL = 2;
 
         readonly Random dice = new Random();
 
@@ -78,10 +78,18 @@ namespace Dungeon_Slayer
 
             hpChange = CalculateHitEffect(hit);
 
+            if(hpChange == 0)
+            {
+                Console.WriteLine("Goblin missed you.");
+                Console.ReadKey(true);
+            }
+            else
+            {
+                Console.WriteLine("You've been hit and lost {0} HP", hpChange);
+                Console.ReadKey(true);
+            }
+
             ChangeHP(-hpChange);
-            
-            Console.WriteLine("You've been hit and lost {0} HP", hpChange);
-            Console.ReadKey(true);
         }
 
         public void FullHeal()
@@ -93,13 +101,20 @@ namespace Dungeon_Slayer
         {
             int attackPower;
             if (ThrowDice() < 10 - _luck)
+            {
                 attackPower = 0;
+                Console.WriteLine("You've missed!");
+                Console.ReadKey(true);
+            }
             else
+            {
                 attackPower = 5 + _power;
+                Console.WriteLine("Goblin received {0} hit points.", attackPower);
+                Console.ReadKey(true);
+            }     
 
             goblin.ReceiveHit(attackPower);
-            Console.WriteLine("Goblin received {0} hit points.", attackPower);
-            Console.ReadKey(true);
+            
         }
 
         public void MovePlayer(Vector2DInt a)

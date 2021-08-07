@@ -5,6 +5,8 @@ using System.Text;
 namespace Dungeon_Slayer
 {
 
+    
+
     struct Vector2DInt
     {
         public int x;
@@ -16,15 +18,7 @@ namespace Dungeon_Slayer
             y = b;
         }
 
-        public static Vector2DInt operator +(Vector2DInt vec1, Vector2DInt vec2)
-        {
-            Vector2DInt ret = new Vector2DInt(vec1.x + vec2.x, vec1.y + vec2.y);
-
-            return ret;
-
-
-        }
-
+        public static Vector2DInt operator +(Vector2DInt a, Vector2DInt b) => new Vector2DInt(a.x + b.x, a.y + b.y);
 
     }
 

@@ -9,11 +9,42 @@ namespace Dungeon_Slayer
         const int MAP_FILL_DENSITY = 55;
         const int INITIAL_POINTS_AVAILABLE = 10;
 
+        const string TITLE = @"▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+██░▄▄▀█░██░█░▄▄▀█░▄▄▄█░▄▄█▀▄▄▀█░▄▄▀████░▄▄▄░█░██░▄▄▀█░██░█░▄▄█░▄▄▀
+██░██░█░██░█░██░█░█▄▀█░▄▄█░██░█░██░████▄▄▄▀▀█░██░▀▀░█░▀▀░█░▄▄█░▀▀▄
+██░▀▀░██▄▄▄█▄██▄█▄▄▄▄█▄▄▄██▄▄██▄██▄████░▀▀▀░█▄▄█▄██▄█▀▀▀▄█▄▄▄█▄█▄▄
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+";
+
         static void Main(string[] args)
         {
 
             Console.CursorVisible = false;
-            Play();            
+            
+
+            while(true)
+            {
+                Console.Clear();
+                Console.WriteLine(TITLE);
+                Console.WriteLine("\n\n1. Start Game\n2. How to Play\n3. Exit");
+                ConsoleKeyInfo option = Console.ReadKey(true);
+                switch(option.Key)
+                {
+                    case ConsoleKey.D1:
+                        Play();
+                        break;
+                    case ConsoleKey.D2:
+                        HowToPlay();
+                        break;
+                    case ConsoleKey.D3:
+                        Quit();
+                        break;
+                    default:
+                        continue;
+                }
+            }
+
+                       
 
         }
 
@@ -51,7 +82,11 @@ namespace Dungeon_Slayer
                     DisplaySideMenu(player, level.GoblinCount, numOfSteps);
 
                     if (input.Key == ConsoleKey.Escape)
-                        Environment.Exit(0);
+                    {
+                        Quit();
+                        level.DrawMap();
+                    }
+                        
 
 
                     switch (input.Key)
@@ -81,15 +116,14 @@ namespace Dungeon_Slayer
                             isLevelPassed = true;
 
                         }
+
                         else if (level.GetObjType(target) == 5)
                         {
                             GoblinCombat(ref player);
-                            if (player.GetHP() <= 0)
-                            {
-                                Lost();
-                            }
+
                             level.RemoveGoblin();
                             level.DrawMap();
+                            DisplaySideMenu(player, level.GoblinCount, numOfSteps);
                         }
 
                     
@@ -113,7 +147,7 @@ namespace Dungeon_Slayer
                 player.LevelUp();
                 endGame = player.IsLevelMaxed();
             }
-
+            Win();
             
         }
         static private void DisplaySideMenu(Player player, int g, int s)
@@ -176,10 +210,10 @@ namespace Dungeon_Slayer
 
         static private void DisplayCombatMenu(Player player, Goblin goblin)
         {
-            Console.SetCursorPosition(47, 0);
+            
             Console.WriteLine("Your HP is {0}  ", player.GetHP());
-            Console.SetCursorPosition(47, 1);
             Console.WriteLine("Goblin's HP is {0}   ", goblin.HP);
+            Console.WriteLine("_______________________________________");
 
         }
         static void GoblinCombat(ref Player player)
@@ -216,6 +250,8 @@ namespace Dungeon_Slayer
 
                 turn++;
             }
+            if (player.GetHP() <= 0)
+                Lost();
 
             player.LootGoblin();
         }
@@ -322,6 +358,39 @@ namespace Dungeon_Slayer
                 return max;
             else
                 return value;
+        }
+
+        static void HowToPlay()
+        {
+            Console.Clear();
+            Console.WriteLine("How to play...");
+            Console.ReadKey(true);
+        }
+
+        static void Quit()
+        {
+            bool loopControl = false;
+
+            Console.Clear();
+            Console.WriteLine("Do you really want to quit? (Y/N)");
+            while (!loopControl)
+            {
+                ConsoleKeyInfo input = Console.ReadKey(true);
+
+                if (input.Key == ConsoleKey.Y)
+                    Environment.Exit(0);
+                else if (input.Key == ConsoleKey.N)
+                    loopControl = true;
+                else continue;
+            }
+            
+        }
+
+        static void Win()
+        {
+            Console.Clear();
+            Console.WriteLine("Congratulations! You won!");
+            Console.ReadKey(true);
         }
     }
 }
