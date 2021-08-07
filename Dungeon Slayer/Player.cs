@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Dungeon_Slayer
 {
-    
+
 
 
     class Player
@@ -24,16 +24,17 @@ namespace Dungeon_Slayer
 
         private Vector2DInt _position;
 
-        public Player(Vector2DInt position, int luck, int agility, int power)
+        public Player(Vector2DInt position, Stats stats, string name)
         {
             _hp = PLAYER_MAX_HEALTH;
             _position.x = position.x;
             _position.y = position.y;
-            _luck = luck;
-            _agility = agility;
-            _power = power;
+            _luck = stats.luck;
+            _agility = stats.agility;
+            _power = stats.power;
             _isAlive = true;
             _level = 1;
+            _name = name;
         }
 
         private int ThrowDice()
@@ -90,6 +91,10 @@ namespace Dungeon_Slayer
         public Vector2DInt GetPosition()
         {
             return _position;
+        }
+        public void SetPosition(Vector2DInt target)
+        {
+            _position = target;
         }
         public int GetHP()
         {

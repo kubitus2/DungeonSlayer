@@ -16,16 +16,29 @@ namespace Dungeon_Slayer
             y = b;
         }
 
-        public static Vector2DInt operator +(Vector2DInt a, Vector2DInt b)
+        public static Vector2DInt operator +(Vector2DInt vec1, Vector2DInt vec2)
         {
-            Vector2DInt sum = new Vector2DInt();
-            sum.x = a.x + b.x;
-            sum.y = a.y + b.y;
+            Vector2DInt ret = new Vector2DInt(vec1.x + vec2.x, vec1.y + vec2.y);
 
-            return sum;
+            return ret;
+
+
         }
 
 
+    }
 
+    struct Stats
+    {
+        public int luck;
+        public int agility;
+        public int power;
+
+        public Stats (int l, int a, int p)
+        {
+            luck = l;
+            agility = a;
+            power = p;
+        }
     }
 }

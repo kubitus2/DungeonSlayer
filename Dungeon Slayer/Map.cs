@@ -7,6 +7,7 @@ namespace Dungeon_Slayer
     //Class handling all map related stuff: rendering, generating, etc.
     class Map
     {
+        const int NUM_OF_GOBLINS = 5;
         //minimal distance form the edge where objects can spawn
         const int OBJECT_MARGIN = 5;
         //defines rectangle that will be cleared around certain object
@@ -30,6 +31,8 @@ namespace Dungeon_Slayer
         private Vector2DInt _portalPosition;
         private Vector2DInt _playerStart;
 
+        private int _numberOfGoblins;
+
         public Map(int width, int height, int fillDensity)
         {
             _mapWidth = width;
@@ -40,6 +43,7 @@ namespace Dungeon_Slayer
             _portalPosition.y = 0;
             _playerStart.x = 0;
             _playerStart.y = 0;
+            _numberOfGoblins = NUM_OF_GOBLINS;
         }
 
         //random block 0 or 1 based on denssity
@@ -202,6 +206,36 @@ namespace Dungeon_Slayer
             _map = temp;
         }
 
+        private bool IsFreeSpot(Vector2DInt pos)
+        {
+            return _map[pos.x, pos.y] < 1;
+        }
+        private Vector2DInt RandomPointInFreeSpace()
+        {
+            bool freeSpotFound = false;
+            Vector2DInt spot = new Vector2DInt(0,0);
+
+            while (!freeSpotFound)
+            {
+                spot = new Vector2DInt(psrg.Next(1, _mapWidth - 1), psrg.Next(1, _mapHeight - 1));
+
+                if (IsFreeSpot(spot))
+                    freeSpotFound = true;
+            }
+
+            return spot;
+        }
+        private void SpawnGoblins(int numberOfGoblins)
+        {
+            Vector2DInt[] goblins = new Vector2DInt[numberOfGoblins];
+
+            for(int i = 0; i < numberOfGoblins; i++)
+            {
+                goblins[i] = RandomPointInFreeSpace();
+                _map[goblins[i].x, goblins[i].y] = 5;
+            }
+
+        }
 
         //Turn number codes into tiles.
         private string DecodeSymbol(int code)
@@ -222,6 +256,9 @@ namespace Dungeon_Slayer
                 case 4:
                     symbol = "O";
                     break;
+                case 5:
+                    symbol = "G";
+                    break;
             }
 
             return symbol;
@@ -236,6 +273,7 @@ namespace Dungeon_Slayer
             ChoosePlayerStartingPoint();
             ClearAroundPoint(_playerStart);
             CaveMap(MAX_ITERATIONS);
+            SpawnGoblins(NUM_OF_GOBLINS);
         }
 
         //Draw map on screen.
@@ -257,9 +295,9 @@ namespace Dungeon_Slayer
         }
 
         //Remove any object from given cell.
-        public void BlankCell(int x, int y)
+        public void BlankCell(Vector2DInt coords)
         {
-            _map[x, y] = 0;
+            _map[coords.x, coords.y] = 0;
         }
 
      
@@ -274,6 +312,22 @@ namespace Dungeon_Slayer
         public Vector2DInt GetPlayerStart()
         {
             return _playerStart;
+        }
+
+        public bool IsMovePermitted(Vector2DInt targetPosition)
+        {
+            return !IsWall(targetPosition);
+        }
+
+        public int GetObjType(Vector2DInt pos)
+        {
+            return _map[pos.x, pos.y];
+        }
+
+        public void WriteAt(Vector2DInt pos, string obj)
+        {
+            Console.SetCursorPosition(pos.x, pos.y);
+            Console.Write(obj);
         }
 
 
