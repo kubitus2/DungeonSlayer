@@ -4,35 +4,38 @@ using System.Text;
 
 namespace Dungeon_Slayer
 {
-    //Class handling all map related stuff: rendering, generating, etc.
     class Map
     {
-        const int NUM_OF_GOBLINS = 5;
-        //minimal distance form the edge where objects can spawn
+        //Number of goblins on a map.
+        const int NUM_OF_GOBLINS = 4;
+        //Minimal distance form the edge where objects can spawn.
         const int OBJECT_MARGIN = 5;
-        //defines rectangle that will be cleared around certain object
+        //Defines rectangle that will be cleared around certain objects.
         const int OBJECT_CLEARANCE = 3;
-        //iterations of map smoothing algorithm
+        //Iterations of map smoothing algorithm.
         const int MAX_ITERATIONS = 4;
 
+        //Random Generator.
         readonly Random psrg = new Random();
 
-        //density of initial map fill (0-100).
+        //Density of initial map fill (0-100).
         private int _fillDensity;
 
-        //map dimensions
+        //Map dimensions.
         private int _mapHeight;
         private int _mapWidth;
         
-        //actual map
+        //The Map.
         private int[,] _map;
 
         //Positions of player's starting point and the portal.
         private Vector2DInt _portalPosition;
         private Vector2DInt _playerStart;
 
+        //Number of goblins on a map.
         private int _numberOfGoblins;
 
+        //Constructor.
         public Map(int width, int height, int fillDensity)
         {
             _mapWidth = width;
@@ -46,31 +49,31 @@ namespace Dungeon_Slayer
             _numberOfGoblins = NUM_OF_GOBLINS;
         }
 
-        //random block 0 or 1 based on denssity
+        //Random block 0 or 1 based on fill density.
         private int RandomBlock()
         {
             int rand = psrg.Next(0, 100);
             return rand < _fillDensity ? 0 : 1;
         }
 
-        //fill the map randomly
+        //Fill the map randomly.
         private void RandomFill()
         {
             for (int x = 0; x < _mapWidth; x++)
             {
                 for (int y = 0; y < _mapHeight; y++)
                 {
-                    //ensure that the edge is wall
+                    //Ensure that the edge is wall.
                     if (x == 0 || y == 0 || x == _mapWidth - 1 || y == _mapHeight - 1)
                     {
                         _map[x, y] = 1;
                     }
-                    //horizontal band in the middle to ensure continuity of empty space
+                    //Horizontal band in the middle to ensure continuity of empty space.
                     else if (y == (_mapHeight / 2))
                     {
                         _map[x, y] = 0;
                     }
-                    //ignore other objects
+                    //Ignore other objects.
                     else
                     {
                         _map[x, y] = RandomBlock();
@@ -79,7 +82,7 @@ namespace Dungeon_Slayer
             }
         }
 
-        //place portal in random cell in lower right octant of the map.
+        //Place portal in random cell in lower right octant of the map.
         private void PlacePortal()
         {
             int maxX = _mapWidth / 4;
@@ -95,7 +98,7 @@ namespace Dungeon_Slayer
 
         }
 
-        //place random starting point for player in upper left octant of the map.
+        //Place random starting point for player in upper left octant of the map.
         private void ChoosePlayerStartingPoint()
         {
             int maxX = _mapWidth / 4;
@@ -109,7 +112,7 @@ namespace Dungeon_Slayer
 
         }
 
-        //clear rectangular portion of the map around given point.
+        //Clear rectangular portion of the map around a given point.
         private void ClearAroundPoint(Vector2DInt position)
         {
             for (int i = position.x - OBJECT_CLEARANCE; i <= position.x + OBJECT_CLEARANCE; i++)
@@ -122,16 +125,7 @@ namespace Dungeon_Slayer
             }
         }
 
-        //Check if cell contains wall
-        public bool IsWall(Vector2DInt position)
-        {
-            return _map[position.x, position.y] == 1;
-        }
 
-        public bool IsWall(int x, int y)
-        {
-            return _map[x, y] == 1;
-        }
 
         //Count number of walls in adjacent cells.
         private int CountAdjacentWalls(int x, int y)
@@ -144,7 +138,7 @@ namespace Dungeon_Slayer
                 {
                     if(!(i == x && j == y))
                     {
-                        if (IsWall(i, j))
+                        if (IsWall(new Vector2DInt (i, j)))
                             wallCount++;
                     }
                 }
@@ -185,7 +179,7 @@ namespace Dungeon_Slayer
                 return _map[x, y];
             }
         }
-        //
+        
         //Carve caves by cellural automata algorithm.
         private void CaveMap(int numberOfIterations)
         {
@@ -206,10 +200,9 @@ namespace Dungeon_Slayer
             _map = temp;
         }
 
-        private bool IsFreeSpot(Vector2DInt pos)
-        {
-            return _map[pos.x, pos.y] < 1;
-        }
+
+
+        //Choose random spot in free space.
         private Vector2DInt RandomPointInFreeSpace()
         {
             bool freeSpotFound = false;
@@ -225,6 +218,8 @@ namespace Dungeon_Slayer
 
             return spot;
         }
+
+        //Spawn goblins.
         private void SpawnGoblins(int numberOfGoblins)
         {
             Vector2DInt[] goblins = new Vector2DInt[numberOfGoblins];
@@ -242,33 +237,48 @@ namespace Dungeon_Slayer
         //Turn number codes into tiles.
         private string DecodeSymbol(int code)
         {
-            string symbol = "!";
+            string symbol = "!"; //error symbol
 
             switch(code)
             {
                 case 0:
-                    symbol = " ";
+                    symbol = " "; //blank space
                     break;
                 case 1:
-                    symbol = "#";
+                    symbol = "#"; //wall tile
                     break;
                 case 3:
-                    symbol = "0";
+                    symbol = "0"; //inactive portal
                     break;
                 case 4:
-                    symbol = "O";
+                    symbol = "O"; //portal
                     break;
                 case 5:
-                    symbol = "G";
+                    symbol = "G"; //goblin
                     break;
             }
 
             return symbol;
         }
+
+        //Check object code at given position.
         private int CheckObj(Vector2DInt pos)
         {
             return _map[pos.x, pos.y];
         }
+
+        //Check if given cell is wall.
+        public bool IsWall(Vector2DInt position)
+        {
+            return _map[position.x, position.y] == 1;
+        }
+
+        //Check if given cell is walkable.
+        private bool IsFreeSpot(Vector2DInt pos)
+        {
+            return _map[pos.x, pos.y] == 0;
+        }
+
         //Initialising map.
         public void StartMap()
         {
@@ -286,16 +296,11 @@ namespace Dungeon_Slayer
         public void DrawMap()
         {
             Console.Clear();
-
-            string currentSymbol = string.Empty;
-
             for (int x = 0; x < _mapWidth; x++)
             {
                 for (int y = 0; y < _mapHeight; y++)
                 {
-                    Console.SetCursorPosition(x, y);
-                    currentSymbol = DecodeSymbol(_map[x, y]);
-                    Console.Write(currentSymbol);
+                    WriteAt(new Vector2DInt(x, y), DecodeSymbol(_map[x, y]));
                 }
             }
         }
@@ -306,42 +311,38 @@ namespace Dungeon_Slayer
             _map[coords.x, coords.y] = 0;
         }
 
-     
-
-        public void UpdateCell(int x, int y)
-        {
-            Console.SetCursorPosition(x, y);
-            Console.Write(DecodeSymbol(_map[x, y]));
-        }
-
         //Access to chosen starting point.
         public Vector2DInt GetPlayerStart()
         {
             return _playerStart;
         }
 
+        //Check if move to target is permitted.
         public bool IsMovePermitted(Vector2DInt targetPosition)
         {
             return !IsWall(targetPosition) && CheckObj(targetPosition) != 3;
         }
         
-
+        //Check what kind of object is at given location.
         public int GetObjType(Vector2DInt pos)
         {
             return _map[pos.x, pos.y];
         }
 
+        //Write symbol at given location.
         public void WriteAt(Vector2DInt pos, string obj)
         {
             Console.SetCursorPosition(pos.x, pos.y);
             Console.Write(obj);
         }
 
+        //Decrement number of goblins.
         public void RemoveGoblin()
         {
             _numberOfGoblins--;
         }
 
+        //Goblin count getter.
         public int GoblinCount
         {
             get
@@ -350,14 +351,13 @@ namespace Dungeon_Slayer
 
             }
         }
+
+        //Portal activation.
         public void ActivatePortal()
         {
             _map[_portalPosition.x, _portalPosition.y]++;
             DrawMap();
         }
-
-
-
 
     }
 }

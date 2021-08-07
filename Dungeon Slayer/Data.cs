@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Dungeon_Slayer
+﻿namespace Dungeon_Slayer
 {
-
-    
-
+    //Vector2D to stor (int, int) position.
     struct Vector2DInt
     {
+        //Coords.
         public int x;
         public int y;
 
@@ -18,10 +13,12 @@ namespace Dungeon_Slayer
             y = b;
         }
 
+        //Overload + operator to add two vectors together.
         public static Vector2DInt operator +(Vector2DInt a, Vector2DInt b) => new Vector2DInt(a.x + b.x, a.y + b.y);
 
     }
 
+    //Stats container.
     struct Stats
     {
         public int luck;
