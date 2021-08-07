@@ -108,9 +108,12 @@ namespace Dungeon_Slayer
 
                 //Portal is closed for now.
                 bool portalOpened = false;
+                
 
                 while (!isLevelPassed)
                 {
+
+                    bool countSteps = true;
                     //If no goblins left and portal is not active yet - activate it.
                     if (level.GoblinCount == 0 && !portalOpened)
                     {
@@ -161,6 +164,9 @@ namespace Dungeon_Slayer
                         case ConsoleKey.C: //move down-right
                             target += new Vector2DInt(1, 1);
                             break;
+                        default:
+                            countSteps = false;
+                            break;
 
                     }
 
@@ -192,7 +198,8 @@ namespace Dungeon_Slayer
                         player.SetPosition(target);
 
                         //Step done and can be counted.
-                        numOfSteps++;
+                        if (countSteps)
+                            numOfSteps++;
                     }
 
                 }
