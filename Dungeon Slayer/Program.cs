@@ -78,8 +78,6 @@ namespace Dungeon_Slayer
                     default:
                         continue;
                 }
-
-                
             }          
         }
 
