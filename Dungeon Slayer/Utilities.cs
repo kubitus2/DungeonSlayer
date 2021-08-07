@@ -17,15 +17,12 @@ namespace Dungeon_Slayer
         //Main menu.
         public static void DisplayMainMenu()
         {
-            
-
             Console.Clear();
             Console.WriteLine(TITLE);
             Console.WriteLine("\t\t1. Start Game");
             Console.WriteLine("\t\t2. How to Play");
             Console.WriteLine("\t\t3. Exit");
             Console.WriteLine("\n\nPress corresponding number (NOT numpad) on your keyboard to choose option.");
-
         }
 
         //Simple text line toggler.

@@ -15,7 +15,6 @@
 
         //Overload + operator to add two vectors together.
         public static Vector2DInt operator +(Vector2DInt a, Vector2DInt b) => new Vector2DInt(a.x + b.x, a.y + b.y);
-
     }
 
     //Stats container.

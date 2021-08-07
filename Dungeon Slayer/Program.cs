@@ -52,8 +52,6 @@ namespace Dungeon_Slayer
                 "\n\n\tAnd you are...?"
         };
 
-
-
         static void Main(string[] args)
         {
             //Set console window settings.

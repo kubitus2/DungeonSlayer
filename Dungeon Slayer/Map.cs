@@ -95,7 +95,6 @@ namespace Dungeon_Slayer
             _portalPosition.y = y;
 
             _map[x, y] = 3;
-
         }
 
         //Place random starting point for player in upper left octant of the map.
@@ -109,7 +108,6 @@ namespace Dungeon_Slayer
 
             _playerStart.x = x;
             _playerStart.y = y;
-
         }
 
         //Clear rectangular portion of the map around a given point.
@@ -352,7 +350,7 @@ namespace Dungeon_Slayer
         //Portal activation.
         public void ActivatePortal()
         {
-            _map[_portalPosition.x, _portalPosition.y]++;
+            _map[_portalPosition.x, _portalPosition.y] = 4;
         }
     }
 }
