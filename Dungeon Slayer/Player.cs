@@ -70,14 +70,12 @@ namespace Dungeon_Slayer
         private int CalculateHitEffect(int hit)
         {
             int hitEffect;
-            hitEffect = 0;
 
             if (ThrowDice() < 10 + _luck)
                 hitEffect = 0;
             else
                 hitEffect = hit - 2* _agility - 5;
             
-
             return hitEffect;
         }
 
@@ -139,10 +137,8 @@ namespace Dungeon_Slayer
                 Console.ReadKey(true);
             }     
 
-            goblin.ReceiveHit(attackPower);
-            
+            goblin.ReceiveHit(attackPower);   
         }
-
 
         //GETTERS AND SETTERs
         //Position getter.
@@ -178,8 +174,7 @@ namespace Dungeon_Slayer
             get 
             {
                 return _name;
-            }
-            
+            }   
         }
 
         //Level getter.
@@ -187,7 +182,6 @@ namespace Dungeon_Slayer
         {
             return _level;
         }
-
 
         //LevelUp.
         public void LevelUp()

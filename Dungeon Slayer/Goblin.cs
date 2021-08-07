@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Dungeon_Slayer
+﻿namespace Dungeon_Slayer
 {
     class Goblin
     {

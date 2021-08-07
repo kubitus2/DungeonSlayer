@@ -1,4 +1,9 @@
-﻿using System;
+﻿//This is simple rougelike game prototype written in C#.
+//It has menus, procedurally generated map (using cellural automata) and simple combat system.
+//Coding and concept by Jakub Osiński, August 2021
+
+
+using System;
 
 namespace Dungeon_Slayer
 {
@@ -9,16 +14,49 @@ namespace Dungeon_Slayer
         const int MAP_HEIGHT = 30;
         
         //Map fill density.
-        const int MAP_FILL_DENSITY = 55;
+        const int MAP_FILL_DENSITY = 42;
         //Initial XP points to build character stats.
-        const int INITIAL_POINTS_AVAILABLE = 10;
+        const int INITIAL_POINTS_AVAILABLE = 6;
+        //Points of XP available after each level.
+        const int XP_POINTS_PER_LEVEL = 4;
+
+        //How to play menu option text.
+        static string[] HowToPlay =
+        {
+                "You explore immense caverns of Uelitschka gold mines.",
+                "These were abandoned long ago and are all full of blood-thirsty goblins.",
+                "Your goal is to clean the rooms of all enemies.",
+                "By cleaning each room you are granted XP. You can spend it on three perks: Agility, Luck and Power.",
+                "\tPower makes you stronger and more deadly to your oponents.",
+                "\tAgility makes you more resistant and durable.",
+                "\tLuck give you better chance of hitting your target or missing their attack.",
+                "\tIt also raises your chance of looting healing potion from defeated goblin.",
+                "You win after clearing all the rooms.",
+                "You move with W, S, A, D keys.",
+                "You can also strafe diagonally with Q, E, A and D.",
+                "Bump into the goblin (G) to start the fight.",
+                "\n\n\t\tGodspede, brave warrior!"
+        };
+
+        //Intro text.
+        static string[] intro =
+        {
+                "Hmmm, huh, were you saying something?",
+                "We will go through this in a moment... I have, let's say, urgent problem here...",
+                "You see this narrow entrance between rocks? It's entry to famous Uelitschka gold mines.",
+                "They belonged to the kingdom of Caracov for thousand of years but 12 years ago we entered some long-forgotten corridors.",
+                "New pasage was opened and we were swarmed by army of goblins.",
+                "Ahh, you are looking for the Elder Emelard? Let's say, I'm gonna help you if you help me.",
+                "Would you mind giving me a helping hand with those pesky goblins?",
+                "Wait, I guess we didn't have a chance to introduce ourselves. My name is Palguin, royal mining advisor.",
+                "\n\n\tAnd you are...?"
+        };
 
 
 
         static void Main(string[] args)
         {
-
-            
+            //Set console window settings.
             Utilities.SetWindowSetting();
 
             //Main menu controls.
@@ -32,7 +70,7 @@ namespace Dungeon_Slayer
                         Play();             //Start game.
                         break;
                     case ConsoleKey.D2:
-                        Utilities.HowToPlay();        //Instructions.
+                        Utilities.UpdatingText(HowToPlay);        //Instructions.
                         break;
                     case ConsoleKey.D3:
                         Utilities.Quit();             //Quit game.
@@ -40,19 +78,23 @@ namespace Dungeon_Slayer
                     default:
                         continue;
                 }
+
+                
             }          
         }
 
         //Main gameplay.
         static void Play()
         {
+            Utilities.UpdatingText(intro);
+
             //Steps counter.
             int numOfSteps = 0;
 
             //Create new map object.
             Map level = new Map(MAP_WIDTH, MAP_HEIGHT, MAP_FILL_DENSITY);
 
-            bool endGame = true;
+            bool endGame = false;
 
             //Create new player.
             Player player = CreatePlayer();
@@ -68,16 +110,16 @@ namespace Dungeon_Slayer
                 player.SetPosition(level.GetPlayerStart());
                 player.RenderPlayer();
 
-                //Portal is cloded for now.
+                //Portal is closed for now.
                 bool portalOpened = false;
 
                 while (!isLevelPassed)
                 {
-
                     //If no goblins left and portal is not active yet - activate it.
                     if (level.GoblinCount == 0 && !portalOpened)
                     {
                         level.ActivatePortal();
+                        level.DrawMap();
                         portalOpened = true;
                     }
                         
@@ -127,7 +169,7 @@ namespace Dungeon_Slayer
                     }
 
                     //Check if move is permitted.
-                    if (level.IsMovePermitted(target))
+                    if (level.IsMovePermitted(target) && Utilities.IsInBufferBounds(target))
                     {
                         //Remove player avatar from old position.
                         level.BlankCell(player.GetPosition());
@@ -150,10 +192,8 @@ namespace Dungeon_Slayer
 
                         //Update map and player.
                         level.WriteAt(player.GetPosition(), " ");
-                        player.SetPosition(target);
-
-                        //place player avatar in the new pos
                         level.WriteAt(target, "@");
+                        player.SetPosition(target);
 
                         //Step done and can be counted.
                         numOfSteps++;
@@ -166,8 +206,8 @@ namespace Dungeon_Slayer
                 //Check if end game condition is met.
                 endGame = player.IsLevelMaxed();
 
-                //Update stats after everyt level. New 4 points of XP awarded.
-                player.UpdateStats(StatsMenu(4, player));
+                //Update stats after every level. New points of XP awarded.
+                player.UpdateStats(StatsMenu(XP_POINTS_PER_LEVEL, player));
             }
 
             //Win sequence.
@@ -199,8 +239,7 @@ namespace Dungeon_Slayer
             Player player = new Player(new Vector2DInt (0, 0), name);
 
             //Let player set his/her/hxx stats.
-            Stats stats = StatsMenu(INITIAL_POINTS_AVAILABLE, player);
-            player.UpdateStats(stats);
+            player.UpdateStats(StatsMenu(INITIAL_POINTS_AVAILABLE, player));
 
             return player;
         }
@@ -215,17 +254,16 @@ namespace Dungeon_Slayer
             Console.WriteLine("What is your name traveller: \n");
             name = Console.ReadLine();
 
-
             //Name the player nameless if no name provided. Greet him in the dungeon.
-            if(name == "")
+            if(name == String.Empty)
             {
-                Console.WriteLine("Not a talkative type you are, aren't you? \n Anyway, welcome to the ancient dungeon, Nameless Monster Slayer!");
+                Console.WriteLine("Not a talkative type you are, aren't you? \nAnyway, welcome to the ancient mines of Uelitschka, Monster Slayer!");
                 Console.ReadLine();
                 name = "Nameless";
             }
             else
             {
-                Console.WriteLine("Welcome to the ancient dungeon, {0} the Monster Slayer!", name);
+                Console.WriteLine("Welcome to the ancient mines of Uelitschka, {0} the Monster Slayer!", name);
                 Console.ReadLine();
             }
 
@@ -371,8 +409,6 @@ namespace Dungeon_Slayer
                         pts = MathUtils.Clamp(0, points, pts + 1);
                         break;
                 }
-
-                
             }
 
             //Create and return new stats values.
@@ -380,13 +416,5 @@ namespace Dungeon_Slayer
 
             return stats;
         }
-
-
-
-
-
-
-
-
     }
 }

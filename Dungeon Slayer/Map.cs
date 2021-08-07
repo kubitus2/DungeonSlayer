@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Dungeon_Slayer
 {
@@ -12,8 +10,11 @@ namespace Dungeon_Slayer
         const int OBJECT_MARGIN = 5;
         //Defines rectangle that will be cleared around certain objects.
         const int OBJECT_CLEARANCE = 3;
+        //CAUTION: OBJECT_CLREANCE must be smaller than OBJECT_MARGIN. Otherwise OutOfBounds excemption may occur.
+
+
         //Iterations of map smoothing algorithm.
-        const int MAX_ITERATIONS = 4;
+        const int MAX_ITERATIONS = 3;
 
         //Random Generator.
         readonly Random psrg = new Random();
@@ -52,8 +53,7 @@ namespace Dungeon_Slayer
         //Random block 0 or 1 based on fill density.
         private int RandomBlock()
         {
-            int rand = psrg.Next(0, 100);
-            return rand < _fillDensity ? 0 : 1;
+            return psrg.Next(0, 100) > _fillDensity ? 0 : 1;
         }
 
         //Fill the map randomly.
@@ -125,8 +125,6 @@ namespace Dungeon_Slayer
             }
         }
 
-
-
         //Count number of walls in adjacent cells.
         private int CountAdjacentWalls(int x, int y)
         {
@@ -176,6 +174,7 @@ namespace Dungeon_Slayer
             }
             else
             {
+                //Leave other object than walls and empty tiles alone.
                 return _map[x, y];
             }
         }
@@ -200,13 +199,12 @@ namespace Dungeon_Slayer
             _map = temp;
         }
 
-
-
         //Choose random spot in free space.
         private Vector2DInt RandomPointInFreeSpace()
         {
             bool freeSpotFound = false;
-            Vector2DInt spot = new Vector2DInt(0,0);
+
+            Vector2DInt spot = new Vector2DInt(0, 0);
 
             while (!freeSpotFound)
             {
@@ -222,17 +220,14 @@ namespace Dungeon_Slayer
         //Spawn goblins.
         private void SpawnGoblins(int numberOfGoblins)
         {
-            Vector2DInt[] goblins = new Vector2DInt[numberOfGoblins];
+            Vector2DInt newGoblinPos;
 
             for(int i = 0; i < numberOfGoblins; i++)
             {
-                goblins[i] = RandomPointInFreeSpace();
-                _map[goblins[i].x, goblins[i].y] = 5;
+                newGoblinPos = RandomPointInFreeSpace();
+                _map[newGoblinPos.x, newGoblinPos.y] = 5;
             }
-
         }
-
-
 
         //Turn number codes into tiles.
         private string DecodeSymbol(int code)
@@ -276,7 +271,8 @@ namespace Dungeon_Slayer
         //Check if given cell is walkable.
         private bool IsFreeSpot(Vector2DInt pos)
         {
-            return _map[pos.x, pos.y] == 0;
+            //other walkable tiles can be coded with negative ints
+            return _map[pos.x, pos.y] < 1; 
         }
 
         //Initialising map.
@@ -320,9 +316,10 @@ namespace Dungeon_Slayer
         //Check if move to target is permitted.
         public bool IsMovePermitted(Vector2DInt targetPosition)
         {
-            return !IsWall(targetPosition) && CheckObj(targetPosition) != 3;
+            return CheckObj(targetPosition) == 0 || CheckObj(targetPosition) > 3;
         }
         
+
         //Check what kind of object is at given location.
         public int GetObjType(Vector2DInt pos)
         {
@@ -356,8 +353,6 @@ namespace Dungeon_Slayer
         public void ActivatePortal()
         {
             _map[_portalPosition.x, _portalPosition.y]++;
-            DrawMap();
         }
-
     }
 }
