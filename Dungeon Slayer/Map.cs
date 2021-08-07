@@ -343,7 +343,6 @@ namespace Dungeon_Slayer
             get
             {
                 return _numberOfGoblins;
-
             }
         }
 
