@@ -237,6 +237,8 @@ namespace Dungeon_Slayer
 
         }
 
+
+
         //Turn number codes into tiles.
         private string DecodeSymbol(int code)
         {
@@ -263,7 +265,10 @@ namespace Dungeon_Slayer
 
             return symbol;
         }
-
+        private int CheckObj(Vector2DInt pos)
+        {
+            return _map[pos.x, pos.y];
+        }
         //Initialising map.
         public void StartMap()
         {
@@ -274,6 +279,7 @@ namespace Dungeon_Slayer
             ClearAroundPoint(_playerStart);
             CaveMap(MAX_ITERATIONS);
             SpawnGoblins(NUM_OF_GOBLINS);
+            _numberOfGoblins = NUM_OF_GOBLINS;
         }
 
         //Draw map on screen.
@@ -316,8 +322,9 @@ namespace Dungeon_Slayer
 
         public bool IsMovePermitted(Vector2DInt targetPosition)
         {
-            return !IsWall(targetPosition);
+            return !IsWall(targetPosition) && CheckObj(targetPosition) != 3;
         }
+        
 
         public int GetObjType(Vector2DInt pos)
         {
@@ -329,6 +336,27 @@ namespace Dungeon_Slayer
             Console.SetCursorPosition(pos.x, pos.y);
             Console.Write(obj);
         }
+
+        public void RemoveGoblin()
+        {
+            _numberOfGoblins--;
+        }
+
+        public int GoblinCount
+        {
+            get
+            {
+                return _numberOfGoblins;
+
+            }
+        }
+        public void ActivatePortal()
+        {
+            _map[_portalPosition.x, _portalPosition.y]++;
+            DrawMap();
+        }
+
+
 
 
     }

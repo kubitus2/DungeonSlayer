@@ -32,10 +32,12 @@ namespace Dungeon_Slayer
             _hp -= hit;
         }
 
-        public void Attack(Player player)
+        public void Attack(ref Player player)
         {
             player.ReceiveHit(_attackPower);
         }
+
+        
 
     }
 }

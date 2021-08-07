@@ -10,6 +10,7 @@ namespace Dungeon_Slayer
     class Player
     {
         const int PLAYER_MAX_HEALTH = 100;
+        const int PLAYER_MAX_LEVEL = 3;
 
         readonly Random dice = new Random();
 
@@ -24,18 +25,19 @@ namespace Dungeon_Slayer
 
         private Vector2DInt _position;
 
-        public Player(Vector2DInt position, Stats stats, string name)
+        public Player(Vector2DInt position, string name)
         {
             _hp = PLAYER_MAX_HEALTH;
             _position.x = position.x;
             _position.y = position.y;
-            _luck = stats.luck;
-            _agility = stats.agility;
-            _power = stats.power;
+            _luck = 0;
+            _agility = 0;
+            _power = 0;
             _isAlive = true;
             _level = 1;
             _name = name;
         }
+
 
         private int ThrowDice()
         {
@@ -55,8 +57,13 @@ namespace Dungeon_Slayer
         private int CalculateHitEffect(int hit)
         {
             int hitEffect;
-            hitEffect = ThrowDice();
-            //algorithm
+            hitEffect = 0;
+
+            if (ThrowDice() < 10 + _luck)
+                hitEffect = 0;
+            else
+                hitEffect = hit - 2* _agility - 5;
+            
 
             return hitEffect;
         }
@@ -71,7 +78,10 @@ namespace Dungeon_Slayer
 
             hpChange = CalculateHitEffect(hit);
 
-            ChangeHP(hpChange);
+            ChangeHP(-hpChange);
+            
+            Console.WriteLine("You've been hit and lost {0} HP", hpChange);
+            Console.ReadKey(true);
         }
 
         public void FullHeal()
@@ -79,9 +89,17 @@ namespace Dungeon_Slayer
             ChangeHP(1000);
         }
 
-        public void Attack(Goblin goblin)
+        public void Attack(ref Goblin goblin)
         {
-            //
+            int attackPower;
+            if (ThrowDice() < 10 - _luck)
+                attackPower = 0;
+            else
+                attackPower = 5 + _power;
+
+            goblin.ReceiveHit(attackPower);
+            Console.WriteLine("Goblin received {0} hit points.", attackPower);
+            Console.ReadKey(true);
         }
 
         public void MovePlayer(Vector2DInt a)
@@ -100,16 +118,65 @@ namespace Dungeon_Slayer
         {
             return _hp;
         }
+
+        public Stats Stats
+        {
+            get
+            {
+                return new Stats(_luck, _agility, _power); 
+            }
+        }
+        public string Name
+        {
+            get 
+            {
+                return _name;
+            }
+            
+        }
         
         public void LevelUp()
         {
             _level++;
+        }
+        public int GetLevel()
+        {
+            return _level;
         }
 
         public void RenderPlayer()
         {
             Console.SetCursorPosition(_position.x, _position.y);
             Console.Write("@");
+        }
+
+        public void UpdateStats(Stats stats)
+        {
+            _agility = stats.agility;
+            _luck = stats.luck;
+            _power = stats.luck;
+        }
+
+        public void LootGoblin()
+        {
+            if(ThrowDice() < 10 - _luck && _hp < 30)
+            {
+                Console.Clear();
+                Console.WriteLine("You have found powerful healing potion in goblin's carcass! \nFull HP restored!");
+                FullHeal();
+                Console.ReadKey(true);
+            }
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("Goblin did not have anything with him...");
+                Console.ReadKey(true);
+            }    
+        }
+
+        public bool IsLevelMaxed()
+        {
+            return _level >= PLAYER_MAX_LEVEL;
         }
 //
 
