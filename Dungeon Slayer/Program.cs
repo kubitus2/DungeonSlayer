@@ -1,5 +1,5 @@
 ﻿//This is simple rougelike game prototype written in C#.
-//It has menus, procedurally generated map (using cellural automata) and simple combat system.
+//It has menus, procedurally generated map (using cellular automata) and simple combat system.
 //Coding and concept by Jakub Osiński, August 2021
 
 
